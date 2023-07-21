@@ -55,3 +55,7 @@ body, html {
 .navbar .btn {
   margin-right: 10px;
 }
+
+.navbar-toggle .icon-bar {
+    background-color: #04AFF0;
+}

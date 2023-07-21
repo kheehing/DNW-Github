@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const userRoutes = require('./routes/user');
 const session = require('express-session');
+const authorEmail = "author@onlyblog.com";
 
 //generating a random Key
 const generateSecretKey = () => {
