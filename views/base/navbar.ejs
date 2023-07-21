@@ -29,7 +29,14 @@
                 </li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                <li><a href="#">Link</a></li>
+                    <% if (userEmail) { %>
+                        <li><a href="#"><%= userEmail %></a></li>
+                        <li><a href="/logout">Logout</a></li>
+                    <% } else { %>
+                        <!-- Display regular links if userEmail is not defined (user not logged in) -->
+                        <li><a href="/login">Login</a></li>
+                        <!-- Add other regular links as needed -->
+                    <% } %>
                 </ul>
           </div><!-- /.navbar-collapse -->
         </div><!-- /.container -->

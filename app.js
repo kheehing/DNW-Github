@@ -3,7 +3,15 @@ const app = express();
 const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const userRoutes = require('./routes/user');
-
+const session = require('express-session');
+//generating a random Key
+const generateSecretKey = () => {
+    const timestamp = Date.now().toString(36); // Convert current timestamp to base36
+    const randomString = Math.random().toString(36).slice(2); // Generate a random base36 string
+    const secret = timestamp + randomString; // Combine the timestamp and random string
+    return secret;
+};
+const secretKey = generateSecretKey();
 // Initialize the database connection
 global.db = new sqlite3.Database('./database.db',function(err){
     if(err){
@@ -20,7 +28,16 @@ app.use(express.static(__dirname + '/public'));
 app.use('/user', userRoutes); //this adds all the userRoutes to the app under the path /user
 app.set('view engine', 'ejs'); //set the app to use ejs for rendering
 app.use(express.urlencoded({ extended: true })); // Middleware to parse form data
-
+app.use(session({
+    secret: secretKey, // Secret key
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false } // If you are using https, you should set this to true
+}));
+app.use((req, res, next) => {
+    res.locals.userEmail = req.session.user ? req.session.user.email : '';
+    next();
+});
 //  =========================================================
 //  ====================== Functions ========================
 //  =========================================================
@@ -36,7 +53,18 @@ function isEmailRegistered(email) {
         });
     });
 }
+
+//  =========================================================
+//  ======================== INDEX ==========================
+//  =========================================================
+
+app.get('/', (req, res) => {
+    // Assuming you have a variable 'userEmail' that holds the user's email after successful login
+    const userEmail = req.session.user ? req.session.user.email : '';
   
+    // Render the 'index' view and pass the 'userEmail' variable to the view
+    res.render('index', { userEmail });
+  });
 
 //  =========================================================
 //  ======================== LOGIN ==========================
@@ -46,11 +74,11 @@ app.get('/login', (req, res) => {
     res.render('login'); // Assuming your 'index.ejs' file is directly in the 'views' folder.
   });
 
-app.post('/login', (req, res) => {
+  app.post('/login', (req, res) => {
     const { email, password } = req.body;
-  
+
     // Check if the provided email exists in the database
-    db.get('SELECT user_password FROM userLoginInfo WHERE user_email = ?', [email], (err, row) => {
+    db.get('SELECT * FROM userLoginInfo WHERE user_email = ?', [email], (err, row) => {
         if (err) {
             console.error(err);
             return res.status(500).json({ error: 'Internal Server Error' });
@@ -71,7 +99,13 @@ app.post('/login', (req, res) => {
                 return res.status(401).json({ error: 'Invalid credentials' }); // Invalid credentials
             }
 
-            // Password is correct, user is authenticated, you can implement further actions here
+            // session, when password is correct
+            req.session.user = {
+                id: row.user_id,
+                email: row.user_email
+            };
+
+            // Send a success JSON response
             return res.status(200).json({ message: 'Login successful' });
         });
     });
