@@ -78,13 +78,14 @@
                     data: formData,
                     dataType: 'json',
                     success: (data) => {
-                        // Registration successful (redirect to a login page)
+                        // Registration successful
+                        alert(data.message); // Show the success message in an alert
                         window.location.href = "/login";
                         console.log(data.message);
                     },
                     error: (error) => {
-                        // Registration failed (display the error message on the same page)
-                        alert(error.responseJSON.error);
+                        // Registration failed
+                        alert(error.responseJSON.error); // Show the error message in an alert
                     }
                 });
             });

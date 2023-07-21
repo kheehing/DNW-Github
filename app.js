@@ -4,6 +4,7 @@ const sqlite3 = require('sqlite3').verbose();
 const bcrypt = require('bcrypt');
 const userRoutes = require('./routes/user');
 const session = require('express-session');
+
 //generating a random Key
 const generateSecretKey = () => {
     const timestamp = Date.now().toString(36); // Convert current timestamp to base36
@@ -12,6 +13,7 @@ const generateSecretKey = () => {
     return secret;
 };
 const secretKey = generateSecretKey();
+
 // Initialize the database connection
 global.db = new sqlite3.Database('./database.db',function(err){
     if(err){
@@ -55,18 +57,6 @@ function isEmailRegistered(email) {
 }
 
 //  =========================================================
-//  ======================== INDEX ==========================
-//  =========================================================
-
-app.get('/', (req, res) => {
-    // Assuming you have a variable 'userEmail' that holds the user's email after successful login
-    const userEmail = req.session.user ? req.session.user.email : '';
-  
-    // Render the 'index' view and pass the 'userEmail' variable to the view
-    res.render('index', { userEmail });
-  });
-
-//  =========================================================
 //  ======================== LOGIN ==========================
 //  =========================================================
 
@@ -74,7 +64,7 @@ app.get('/login', (req, res) => {
     res.render('login'); // Assuming your 'index.ejs' file is directly in the 'views' folder.
   });
 
-  app.post('/login', (req, res) => {
+app.post('/login', (req, res) => {
     const { email, password } = req.body;
 
     // Check if the provided email exists in the database
@@ -136,14 +126,14 @@ app.get('/register', (req, res) => {
 
 app.post('/register', async (req, res) => {
     const { email, confirmemail, password, confirmpassword } = req.body;
-  
+
     // Check if passwords match
     if (email !== confirmemail) {
-      return res.status(400).json({ error: 'Emails do not match' });
+        return res.status(400).json({ error: 'Emails do not match' });
     } else if (password !== confirmpassword) {
-      return res.status(400).json({ error: 'Passwords do not match' });
+        return res.status(400).json({ error: 'Passwords do not match' });
     }
-  
+
     try {
         const emailExists = await isEmailRegistered(email);
         if (emailExists) {
@@ -156,7 +146,7 @@ app.post('/register', async (req, res) => {
                 console.error(err);
                 return res.status(500).json({ error: 'Internal Server Error' });
             }
-    
+
             // Save the email and hashed password in the "userLoginInfo" table
             db.run('INSERT INTO userLoginInfo (user_email, user_password) VALUES (?, ?)', [email, hashedPassword], (err) => {
                 if (err) {
@@ -177,7 +167,10 @@ app.post('/register', async (req, res) => {
 //  =========================================================
 
 app.get('/', (req, res) => {
-    res.render('index'); // Assuming your 'index.ejs' file is directly in the 'views' folder.
+    const userEmail = req.session.user ? req.session.user.email : '';
+  
+    // Render the 'index' view and pass the 'userEmail' variable to the view
+    res.render('index', { userEmail });
   });
 
 
