@@ -57,6 +57,18 @@ function isEmailRegistered(email) {
     });
 }
 
+function checkAuthorAccess(req, res, next) {
+    const userEmail = req.session.user ? req.session.user.email : null;
+
+    // Check if the user's email is "author@onlyblog.com"
+    if (userEmail === authorEmail) {
+        next(); // If the user is authorized, proceed to the next
+    } else {
+        // If the user is not authorized, redirect to a index
+        res.redirect('/');
+    }
+}
+
 //  =========================================================
 //  ======================== LOGIN ==========================
 //  =========================================================
@@ -174,5 +186,44 @@ app.get('/', (req, res) => {
     res.render('index', { userEmail });
   });
 
+//  =========================================================
+//  ===================== Author Home =======================
+//  =========================================================
+
+app.get('/author', checkAuthorAccess, (req, res) => {
+    res.render('authorhome');
+});
+
+//  =========================================================
+//  ==================== Author Setting =====================
+//  =========================================================
+
+app.get('/author/setting', checkAuthorAccess, (req, res) => {
+    res.render('authorsetting');
+});
+
+//  =========================================================
+//  ==================== Author Article =====================
+//  =========================================================
+
+app.get('/author/article', checkAuthorAccess, (req, res) => {
+    res.render('authorarticle');
+});
+
+//  =========================================================
+//  ===================== Reader Home =======================
+//  =========================================================
+
+app.get('/reader', (req, res) => {
+    res.render('readerhome');
+});
+
+//  =========================================================
+//  ==================== Reader Article =====================
+//  =========================================================
+
+app.get('/reader/article', (req, res) => {
+    res.render('readerarticle');
+});
 
 module.exports = app;
