@@ -1,0 +1,57 @@
+@font-face {
+  font-family: 'Gotham Light';
+  src: url('../fonts/GothamLight.otf') format('opentype');
+}
+
+@font-face {
+  font-family: 'Marguerite';
+  src: url('../fonts/Marguerite.ttf') format('truetype');
+}
+
+.only {
+  font-family: 'Gotham Light', sans-serif !important;
+}
+
+.blog {
+  font-family: 'Marguerite', sans-serif !important;
+  color: #04AFF0;
+}
+
+
+body, html {
+  height: 80vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Hero */
+
+.hero {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.hero h1 {
+  margin-bottom: 1rem;
+}
+
+.hero .btn {
+  margin: 0.5rem;
+}
+
+/* Navbar */
+
+.navbar {
+  background-color: transparent;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.navbar .btn {
+  margin-right: 10px;
+}
