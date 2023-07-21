@@ -112,6 +112,21 @@ app.get('/login', (req, res) => {
 });
 
 //  =========================================================
+//  ======================== LOGOUT =========================
+//  =========================================================
+
+app.get('/logout', (req, res) => {
+    // Clear the user session to log them out
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+      }
+      // Redirect the user to the homepage after logout
+      res.redirect('/');
+    });
+  });
+
+//  =========================================================
 //  ====================== REGISTER =========================
 //  =========================================================
 
