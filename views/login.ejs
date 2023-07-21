@@ -13,7 +13,7 @@
             <div class="card">
               <div class="card-body">
                 <h2 class="card-title text-center">Log in to Your Account</h2>
-                <form action="/login" method="POST">
+                <form id="login-form" method="POST">
                   <div class="form-group">
                     <label for="email">Email address</label>
                     <input type="email" class="form-control" id="email" name="email" required>
@@ -38,5 +38,46 @@
           </div>
         </div>
       </div>
+      
+      <script>
+        $(document).ready(() => {
+          $('#login-form').submit((event) => {
+            event.preventDefault(); // Prevent the default form submission
+      
+            const email = $('#email').val();
+            const password = $('#password').val();
+      
+            // Prepare the data to send to the server
+            const formData = {
+              email: email,
+              password: password
+            };
+      
+            // Send the AJAX request
+            $.ajax({
+              type: 'POST',
+              url: '/login',
+              data: formData,
+              dataType: 'json',
+              success: (data) => {
+                // Display a success message in an alert
+                alert(data.message);
+                // Optionally, you can redirect the user to a different page after successful login
+                window.location.href = '/dashboard'; // Replace '/dashboard' with the desired page URL
+              },
+              error: (xhr, status, error) => {
+                const responseText = xhr.responseText;
+                try {
+                  const errorResponse = JSON.parse(responseText);
+                  alert(errorResponse.error);
+                } catch (err) {
+                  console.error('Error parsing JSON:', err); // Debugging statement
+                  alert('An error occurred while processing your request.');
+                }
+              }
+            });
+          });
+        });
+      </script>
 </body>
 </html>

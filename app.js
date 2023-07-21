@@ -57,25 +57,25 @@ app.post('/login', (req, res) => {
         }
 
         if (!row) {
-            return res.status(401).json({ error: 'Invalid credentials' }); // Email not found
+            return res.status(401).json({ error: 'Invalid credentials' }); // Email not found or Invalid credentials
         }
 
         // Compare the provided password with the hashed password in the database
         bcrypt.compare(password, row.user_password, (err, result) => {
-        if (err) {
-            console.error(err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
 
-        if (!result) {
-            return res.status(401).json({ error: 'Invalid credentials' }); // Password doesn't match
-        }
+            if (!result) {
+                return res.status(401).json({ error: 'Invalid credentials' }); // Invalid credentials
+            }
 
-        // Password is correct, user is authenticated, you can implement further actions here
-        return res.status(200).json({ message: 'Login successful' });
+            // Password is correct, user is authenticated, you can implement further actions here
+            return res.status(200).json({ message: 'Login successful' });
         });
     });
-  });
+});
 
 //  =========================================================
 //  ====================== REGISTER =========================
