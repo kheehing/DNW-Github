@@ -6,19 +6,90 @@
 </head>
 <body>
     <%- include ('base/navbar'); %>
-    <!-- Hero Section -->
-    <section class="hero text-light text-center py-5">
-        <div class="container">
-            <h1 class="display-4">In the Realm of the Log, There's 
-                <span class="text-center"><span class="only">Only</span><span class="blog">Blog</span></span></h1>
-            <p class="lead">In the realm of logs, where thoughts meet words, OnlyBlog reigns as the ultimate platform for passionate bloggers, offering a captivating space to unleash creativity, share insights, and engage in a vibrant community.</p>
-            <% if (!userEmail) { %>
-                <div class="d-flex justify-content-center"> <!-- Use "d-flex justify-content-center" to center the buttons horizontally -->
-                    <a id="register" class="btn btn-primary" href="/register">Get Started</a>
-                    <a id="login" class="btn btn-secondary" href="/login">login</a>
-                </div>
-            <% } %>
+    <div class="container mt-4">
+        <div style="display: flex; justify-content: space-between;">
+            <h1 class="mb-3"><%= userName %>'s Page</h1>
+            <div>
+                <a href="/author/setting" class="btn btn-secondary mr-1">Settings</a>
+                <a href="/author/article" class="btn btn-primary ml-1">Create Article</a>
+            </div>
         </div>
-      </section>
+        <h2 class="mb-3">Published Articles</h2>
+        <% if(publishedArticles.length > 0) { %>
+            <div class="list-group">
+                <% publishedArticles.sort((a, b) => new Date(b.publicationDate) - new Date(a.publicationDate)).forEach(function(article) { %>
+                    <div class="list-group-item container">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div class="container">
+                                <a href="<%= '/articles/' + article.id %>" class="link-dark text-decoration-none">
+                                  <h3 class="mb-1"><%= article.title %></h3>
+                                  <h4 class="mb-1"><%= article.subtitle %></h4>
+                                  <div class="d-flex justify-content-between">
+                                    <!-- Likes container -->
+                                    <div class="likes-container">
+                                      <p><strong>Likes:</strong> <%= article.likes %></p>
+                                    </div>
+                              
+                                    <!-- Dates container -->
+                                    <div class="dates-container">
+                                      <p>
+                                        <span><strong>Published on:</strong> <%= new Date(article.publicationDate).toLocaleDateString() %></span>
+                                        <span><strong>Created at:</strong> <%= new Date(article.createdAt).toLocaleDateString() %></span>
+                                        <span><strong>Last Modified:</strong> <%= new Date(article.lastModified).toLocaleDateString() %></span>
+                                      </p>
+                                    </div>
+                                  </div>
+                                </a>
+                              </div>                     
+                            <form method="POST" action="/author/delete" style="display:inline;">
+                                <input type="hidden" name="articleId" value="<%= article.id %>">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="alert alert-warning">
+                Published articles are empty...
+            </div>
+        <% } %>
+        <br>
+        <h2 class="mt-5 mb-3">Draft Articles</h2>
+        <% if(draftArticles.length > 0) { %>
+            <% draftArticles.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).forEach(function(article) { %>
+                <div class="list-group-item">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <a href="/author/article/<%= article.id %>" class="link-dark text-decoration-none">
+                                <h3 class="mb-1"><%= article.title %></h3>
+                                <p><strong>Created at:</strong> <%= new Date(article.createdAt).toLocaleDateString() %></p>
+                                <p><strong>Last Modified:</strong> <%= new Date(article.lastModified).toLocaleDateString() %></p>
+                            </a>
+                        </div>
+                        <div class="btn-group" role="group" aria-label="Button group">
+                            <form method="GET" action="/author/article/<%= article.id %>" style="display:inline;">
+                                <button type="submit" class="btn btn-primary">Edit Draft</button>
+                            </form>
+                        
+                            <form method="POST" action="/author/publish" style="display:inline;">
+                                <input type="hidden" name="articleId" value="<%= article.id %>">
+                                <button type="submit" class="btn btn-success">Publish</button>
+                            </form>
+                        
+                            <form method="POST" action="/author/delete" style="display:inline;">
+                                <input type="hidden" name="articleId" value="<%= article.id %>">
+                                <button type="submit" class="btn btn-danger">Delete</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="alert alert-warning">
+                Draft articles are empty...
+            </div>
+        <% } %>
+    </div>
 </body>
 </html>

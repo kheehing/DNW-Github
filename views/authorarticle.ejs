@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include ('base/head'); %>
+    <title>Author Article</title>
+</head>
+<body>
+    <%- include ('base/navbar'); %>   
+    <div class="container">
+        <a href="/author" class="btn btn-secondary">< Back to Author Home</a>
+        <div class="row">
+            <h1 class="my-4">Author Article</h1>
+            <p><%= articleCreation %></p>
+        </div>
+        
+        <br>
+    </div>
+    <div class="container mt-4">
+        <form  method="POST">
+            <input type="hidden" id="articleId" name="articleId" value="<%= articleId %>">
+            <div class="form-group">
+                <label for="articleTitle">Article Title:</label>
+                <input type="text" class="form-control" id="articleTitle" name="articleTitle" value="<%= articleTitle %>" required>
+            </div>
+            <div class="form-group">
+                <label for="articleSubtitle">Article Subtitle:</label>
+                <input type="text" class="form-control" id="articleSubtitle" name="articleSubtitle" value="<%= articleSubtitle %>" required>
+            </div>
+            <div class="form-group">
+                <label for="articleText">Article Text:</label>
+                <textarea class="form-control" id="articleText" name="articleText" rows="8" required><%= articleText %></textarea>
+            </div>
+            <div class="container row">
+                <button type="submit" class="btn btn-secondary" formaction="/author/publish">Publish</button>
+                <button type="submit" class="btn btn-primary" formaction="/author/saveasdraft">Save as Draft</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

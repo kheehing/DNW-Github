@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include ('base/head'); %>
+    <title>Author Setting</title>
+</head>
+<body>
+    <%- include ('base/navbar'); %>   
+    <div class="container">
+        <a href="/author" class="btn btn-secondary">< Back to Author Home</a>
+        <h1 class="my-4">Author Settings</h1>
+        <br>
+    </div>
+    <div class="container thinner-container">
+
+
+        <form action="/author/settings" method="POST">
+            <div class="form-group">
+                <label for="blogTitle">Blog Title:</label>
+                <input type="text" class="form-control" id="blogTitle" name="blogTitle" value="<%= blogTitle %>" required>
+            </div>
+            <div class="form-group">
+                <label for="blogSubtitle">Blog Subtitle:</label>
+                <input type="text" class="form-control" id="blogSubtitle" name="blogSubtitle" value="<%= blogSubtitle %>" required>
+            </div>
+            <div class="form-group">
+                <label for="authorName">Author Name:</label>
+                <input type="text" class="form-control" id="authorName" name="authorName" value="<%= authorName %>" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+        </form>
+    </div>
+</body>
+</html>

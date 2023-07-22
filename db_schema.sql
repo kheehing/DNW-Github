@@ -9,14 +9,30 @@ BEGIN TRANSACTION;
 CREATE TABLE IF NOT EXISTS userLoginInfo (
     user_id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_email TEXT UNIQUE NOT NULL,
-    user_password TEXT NOT NULL
+    user_password TEXT NOT NULL,
+    user_name TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS userRecords (
-    record_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    record_value TEXT NOT NULL,
-    user_id  INT, --the user that the record belongs to
-    FOREIGN KEY (user_id) REFERENCES userLoginInfo(user_id)
+CREATE TABLE IF NOT EXISTS Articles (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    subtitle TEXT NOT NULL,
+    author TEXT NOT NULL,
+    content TEXT NOT NULL,
+    createdAt TIMESTAMP NOT NULL,
+    publicationDate TIMESTAMP NOT NULL,
+    isPublished BOOLEAN NOT NULL,
+    lastModified TIMESTAMP NOT NULL,
+    likes INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Comments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    comments TEXT NOT NULL,
+    createdAt TEXT NOT NULL,
+    lastModified TEXT NOT NULL,
+    ArticleId INTEGER NOT NULL,
+    FOREIGN KEY (ArticleId) REFERENCES Articles(id)
 );
 
 --insert default data (if necessary here)

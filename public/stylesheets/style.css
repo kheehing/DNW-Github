@@ -59,3 +59,25 @@ body, html {
 .navbar-toggle .icon-bar {
     background-color: #04AFF0;
 }
+
+/* CUSTOM CONTAINERS */
+
+.thinner-container {
+  max-width: 600px;
+  margin: 0 auto; 
+}
+
+.container {
+  position: relative;
+}
+
+.likes-container {
+  top: 0;
+  left: 0;
+}
+
+.dates-container {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+}
