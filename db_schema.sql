@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS Comments (
     lastModified TEXT NOT NULL,
     ArticleId INTEGER NOT NULL,
     UserId INTEGER NOT NULL,
-    FOREIGN KEY (ArticleId) REFERENCES Articles(id),
+    FOREIGN KEY (ArticleId) REFERENCES Articles(id) ON DELETE CASCADE,
     FOREIGN KEY (UserId) REFERENCES userLoginInfo(user_id)
 );
 
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS Likes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     ArticleId INTEGER NOT NULL,
     UserId INTEGER NOT NULL,
-    FOREIGN KEY (ArticleId) REFERENCES Articles(id),
+    FOREIGN KEY (ArticleId) REFERENCES Articles(id) ON DELETE CASCADE,
     FOREIGN KEY (UserId) REFERENCES userLoginInfo(user_id)
 );
 
