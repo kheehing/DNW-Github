@@ -2,6 +2,15 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcrypt');
 
+// check if the user is logged in
+function checkUserAccess(req, res, next) {
+    if (req.session.user != '') {
+        next();
+    } else {
+        res.redirect('/login');
+    }
+}
+
 //  =========================================================
 //  ===================== Reader Home =======================
 //  =========================================================
@@ -24,44 +33,78 @@ router.get('/', (req, res) => {
 //  ==================== Reader Article =====================
 //  =========================================================
 
-router.get('/article/:id', (req, res) => {
+router.get('/article/:id', checkUserAccess, (req, res) => {
+    const _articleId = req.params.id;
     const sqlArticle = 'SELECT * FROM Articles WHERE id = ?';
     const sqlComments = `SELECT Comments.*, userLoginInfo.user_name AS username FROM Comments JOIN userLoginInfo ON Comments.UserId = userLoginInfo.user_id WHERE ArticleId = ? ORDER BY createdAt DESC`;
-    db.get(sqlArticle, [req.params.id], (err, row) => {
-      if (err) {
-        return console.error(err.message);
-      }
-      if (row) {
-        row.articleCreation = `This article was created on ${new Date(row.createdAt).toLocaleDateString()}`; // Add this line
-        db.all(sqlComments, [req.params.id], (err, comments) => { // Change commentsData to comments
-          if (err) {
+    
+    let _userId = null;
+    if(req.session.user) {
+        _userId = req.session.user.id;
+    }
+    
+    const sqlLike = _userId ? `SELECT * FROM Likes WHERE ArticleId = ? AND UserId = ?` : null;
+
+    db.get(sqlArticle, [_articleId], (err, row) => {
+        if (err) {
             return console.error(err.message);
-          }
-          res.render('readerarticle', { article: row, comments }); // Change commentsData to comments
-        });
-      } else {
-        res.redirect('/reader');
-      }
+        }
+
+        if (row) {
+            row.articleCreation = `This article was created on ${new Date(row.createdAt).toLocaleDateString()}`;
+
+            db.all(sqlComments, [_articleId], (err, comments) => {
+                if (err) {
+                    console.log('error9');
+                    return console.error(err.message);
+                }
+
+                if(_userId && sqlLike) {
+                    db.get(sqlLike, [_articleId, _userId], function(err, like) {
+                        if (err) {
+                            console.log('error99');
+                            return console.error(err.message);
+                        }
+                        res.render('readerarticle', { 
+                            article: row, 
+                            comments, 
+                            userHasLiked: like != null 
+                        });
+                    });
+                } else {
+                    res.render('readerarticle', { 
+                        article: row, 
+                        comments, 
+                        userHasLiked: false 
+                    });
+                }
+            });
+        } else {
+            res.redirect('/reader');
+        }
     });
 });
 
-router.post('/article/:id/like', (req, res) => {
+router.post('/article/:id/like', checkUserAccess, (req, res) => {
     // Check if the user is logged in
-    if (req.session.userId) {
+    const _userId = req.session.user.id;
+    if (_userId) {
         const sqlExists = `SELECT * FROM Likes WHERE ArticleId = ? AND UserId = ?`;
         const sqlInsert = `INSERT INTO Likes (ArticleId, UserId) VALUES (?, ?)`;
         const sqlDelete = `DELETE FROM Likes WHERE ArticleId = ? AND UserId = ?`;
 
         // Check if the like already exists
-        db.get(sqlExists, [req.params.id, req.session.userId], (err, row) => {
+        db.get(sqlExists, [req.params.id, _userId], (err, row) => {
             if (err) {
+                console.log('error7');
                 return console.error(err.message);
             }
 
             if (row) {
                 // The like already exists, so remove it
-                db.run(sqlDelete, [req.params.id, req.session.userId], (err) => {
+                db.run(sqlDelete, [req.params.id, _userId], (err) => {
                     if (err) {
+                        console.log('error5');
                         return console.error(err.message);
                     }
 
@@ -69,6 +112,7 @@ router.post('/article/:id/like', (req, res) => {
                     const sql = `UPDATE Articles SET likes = likes - 1 WHERE id = ?`;
                     db.run(sql, [req.params.id], (err) => {
                         if (err) {
+                            console.log('error123121');
                             return console.error(err.message);
                         }
                         res.json({liked: false});
@@ -76,8 +120,9 @@ router.post('/article/:id/like', (req, res) => {
                 });
             } else {
                 // The like does not exist, so add it
-                db.run(sqlInsert, [req.params.id, req.session.userId], (err) => {
+                db.run(sqlInsert, [req.params.id, _userId], (err) => {
                     if (err) {
+                        console.log('erro222r1');
                         return console.error(err.message);
                     }
 
@@ -85,6 +130,7 @@ router.post('/article/:id/like', (req, res) => {
                     const sql = `UPDATE Articles SET likes = likes + 1 WHERE id = ?`;
                     db.run(sql, [req.params.id], (err) => {
                         if (err) {
+                            console.log('error1');
                             return console.error(err.message);
                         }
                         res.json({liked: true});
@@ -97,7 +143,7 @@ router.post('/article/:id/like', (req, res) => {
     }
 });
 
-router.post('/article/:id/comment', (req, res) => {
+router.post('/article/:id/comment', checkUserAccess, (req, res) => {
     const sqlUser = 'SELECT * FROM userLoginInfo WHERE user_name = ?';
     db.get(sqlUser, req.session.user.name, (err, user) => {
         if (err) {

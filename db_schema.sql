@@ -52,7 +52,6 @@ CREATE TABLE IF NOT EXISTS Blog (
     author TEXT NOT NULL
 );
 
-
 --insert default data (if necessary here)
 
 COMMIT;

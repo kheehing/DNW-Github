@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const authorEmail = "author@onlyblog.com"; // hard coded 'author' email instead of making roles as there is only 1 author.
 
-// Middleware to check if the user is an author
+// check if the user is an author
 function checkAuthorAccess(req, res, next) {
     if (req.session.user && req.session.user.email === authorEmail) {
         next();
