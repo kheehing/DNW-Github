@@ -60,12 +60,11 @@ function isEmailRegistered(email) {
 function checkAuthorAccess(req, res, next) {
     const userEmail = req.session.user ? req.session.user.email : null;
 
-    // Check if the user's email is "author@onlyblog.com"
     if (userEmail === authorEmail) {
         next(); // If the user is authorized, proceed to the next
     } else {
-        // If the user is not authorized, redirect to a index
-        res.redirect('/');
+        // If the user is not authorized, throw 404 error
+        res.status(404).render('404');
     }
 }
 
@@ -205,26 +204,39 @@ app.get('/', (req, res) => {
 //  =========================================================
 
 app.get('/author', checkAuthorAccess, (req, res) => {
-    let sql = 'SELECT * FROM Articles ORDER BY title';
-    let articles = [];
+    let articleQuery = 'SELECT * FROM Articles ORDER BY title';
+    let blogQuery = `
+        SELECT Blog.Title AS blogTitle, Blog.Subtitle AS blogSubtitle, Blog.author AS authorName
+        FROM Blog
+        WHERE Blog.id = 1
+    `;
 
-    db.all(sql, [], (err, rows) => {
+
+    db.all(articleQuery, [], (err, articles) => {
         if (err) {
-            throw err;
+            console.error(err);
+            return res.status(500).send('Internal Server Error');
         }
-        articles = rows;
 
         // Filter published articles and draft articles based on the 'isPublished' flag
-        const publishedArticles = articles.filter((article) => article.isPublished);
-        const draftArticles = articles.filter((article) => !article.isPublished);
+        const publishedArticles = articles.filter(article => article.isPublished);
+        const draftArticles = articles.filter(article => !article.isPublished);
 
-        // define your author object here
-        const author = {
-            name: "Author's Name"  // replace with real author's name
-        };
+        // Fetch blog details
+        db.get(blogQuery, [], (err, blog) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send('Internal Server Error');
+            }
 
-        // include the author object when you render the EJS file
-        res.render('authorhome', { author: author, articles: articles, publishedArticles: publishedArticles, draftArticles: draftArticles });
+            // Render the page with article and blog information
+            res.render('authorhome', { 
+                blog: blog, 
+                articles: articles, 
+                publishedArticles: publishedArticles, 
+                draftArticles: draftArticles 
+            });
+        });
     });
 });
 
@@ -233,36 +245,63 @@ app.get('/author', checkAuthorAccess, (req, res) => {
 //  =========================================================
 
 app.get('/author/setting', checkAuthorAccess, (req, res) => {
-    // Assuming you have the user's session to get the current logged-in user
-    const loggedInUserId = req.session.user ? req.session.user.id : null;
-
-    // Check if the user is logged in. If not, redirect to the login page
-    if (!loggedInUserId) {
-        return res.redirect('/login'); // Change "/login" to your login route
-    }
-
-    // Assuming the userLoginInfo table has a 'user_id' field that corresponds to 'id' in other tables
     const query = `
-        SELECT Blogs.title AS blogTitle, Blogs.subtitle AS blogSubtitle, Blogs.authorName
-        FROM userLoginInfo
-        LEFT JOIN Blogs ON userLoginInfo.user_id = Blogs.id
-        WHERE userLoginInfo.user_id = ?
+        SELECT Blog.Title AS blogTitle, Blog.Subtitle AS blogSubtitle, Blog.author AS authorName
+        FROM Blog
+        WHERE Blog.id = 1
     `;
 
-    db.get(query, [loggedInUserId], (err, row) => {
+    db.get(query, (err, row) => {
         if (err) {
             console.error(err);
             return res.status(500).send('Internal Server Error');
         }
 
-        // Check if the user has a blog
+        // Check if blog exist, if not return empty place holders
         if (!row) {
-            // If the user does not have a blog, you can handle this case accordingly (e.g., redirect to create a blog page)
-            return res.status(404).send('Blog not found');
+            row = ['',''];
         }
 
-        const { blogTitle, blogSubtitle, authorName } = row;
-        res.render('authorsetting', { blogTitle, blogSubtitle, authorName });
+        const { blogTitle, blogSubtitle } = row;
+        res.render('authorsetting', { blogTitle, blogSubtitle });
+    });
+});
+
+app.post('/author/setting/update', checkAuthorAccess, (req, res) => {
+    const { blogTitle, blogSubtitle } = req.body;
+    const authorName = req.session.user.name;
+    // First, try to update the existing row
+    let query = `
+        UPDATE Blog
+        SET Title = ?, Subtitle = ?, author = ?
+        WHERE id = 1
+    `;
+
+    db.run(query, [blogTitle, blogSubtitle, authorName], function(err) {
+        if (err) {
+            console.error(err);
+            return res.status(500).send('Internal Server Error');
+        }
+
+        // Check if the update affected any rows
+        if (this.changes === 0) {
+            // If no rows were updated, insert a new one
+            query = `
+                INSERT INTO Blog (id, Title, Subtitle, author)
+                VALUES (?, ?, ?, ?)
+            `;
+
+            db.run(query, [1, blogTitle, blogSubtitle, authorName], function(err) {
+                if (err) {
+                    console.error(err);
+                    return res.status(500).send('Internal Server Error');
+                }
+
+                res.redirect('/author');
+            });
+        } else {
+            res.redirect('/author');
+        }
     });
 });
 
@@ -442,23 +481,16 @@ app.post('/author/saveasdraft', checkAuthorAccess, (req, res) => {
 //  =========================================================
 
 app.get('/reader', (req, res) => {
-    let sql = 'SELECT * FROM Blogs ORDER BY title';
-    let blogs = [];
+    let sql = 'SELECT * FROM Articles WHERE isPublished = 1 ORDER BY publicationDate DESC';
+    let articles = [];
 
     db.all(sql, [], (err, rows) => {
         if (err) {
             throw err;
         }
-        blogs = rows;
+        articles = rows;
 
-        sql = `SELECT * FROM Articles ORDER BY publicationDate DESC`;
-
-        db.all(sql, [], (err, rows) => {
-            if (err) {
-                throw err;
-            }
-            res.render('readerhome', { blogs: blogs, articles: rows });
-        });
+        res.render('readerhome', { articles: articles });
     });
 });
 
@@ -466,18 +498,33 @@ app.get('/reader', (req, res) => {
 //  ==================== Reader Article =====================
 //  =========================================================
 
-app.get('/reader/article', (req, res) => {
-    res.render('readerarticle');
+app.get('/reader/article/:id', (req, res) => {
+    const sql = 'SELECT * FROM Articles WHERE id = ?';
+    db.get(sql, [req.params.id], (err, row) => {
+        if (err) {
+            return console.error(err.message);
+        }
+        if (row) {
+            row.articleCreation = `This article was created on ${new Date(row.createdAt).toLocaleDateString()}`; // Add this line
+            res.render('readerarticle', { article: row });
+        } else {
+            res.redirect('/reader');
+        }
+    });
 });
-
-module.exports = app;
-
 
 //  =========================================================
 //  ================= Redirect nonexistent ==================
 //  =========================================================
 
 app.get('*', (req, res) => {
-    res.redirect('/');
-  });
-  
+    res.status(404).render('404');
+});
+
+
+
+//  =========================================================
+//  ==================== Export Module ======================
+//  =========================================================
+
+module.exports = app;

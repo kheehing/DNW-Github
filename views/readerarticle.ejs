@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include ('base/head'); %>
+    <title>Reader Article</title>
+</head>
+<body>
+    <%- include ('base/navbar'); %>   
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between">
+            <a href="/reader" class="btn btn-secondary align-self-center">< Back to Reader Home</a>
+            <h1 id="articleTitle"><%= article.title %></h1>
+            <h2 id="articleSubtitle"><%= article.subtitle %></h2>
+            <p><strong>Author: </strong><%= article.author %></p>
+        </div> 
+        <p class="text-muted"><%= article.articleCreation %></p>
+        <hr>
+    </div>
+    <div class="container mt-4">
+        <div class="card p-4">
+            <p id="articleText"><%= article.content %></p> <!-- Change this line -->
+        </div>
+    </div>
+</body>
+</html>

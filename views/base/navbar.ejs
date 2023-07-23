@@ -15,11 +15,9 @@
             <ul class="nav navbar-nav">
                 <% if (userEmail.toLowerCase() === "author@onlyblog.com") { %>
                     <li><a href="/author">Author Home</a></li>
-                    <li><a href="/author/setting">Author Setting</a></li>
-                    <li><a href="/author/article">Author Article</a></li>
+                    <li><a href="/reader">Reader Home</a></li>
                 <% } else { %>
                     <li><a href="/reader">Reader Home</a></li>
-                    <li><a href="/reader/article">Reader Article</a></li>
                 <% } %>
             </ul>
             <ul class="nav navbar-nav navbar-right">

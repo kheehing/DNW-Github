@@ -35,6 +35,14 @@ CREATE TABLE IF NOT EXISTS Comments (
     FOREIGN KEY (ArticleId) REFERENCES Articles(id)
 );
 
+CREATE TABLE IF NOT EXISTS Blog (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Title TEXT NOT NULL,
+    Subtitle TEXT NOT NULL,
+    author TEXT NOT NULL
+);
+
+
 --insert default data (if necessary here)
 
 COMMIT;

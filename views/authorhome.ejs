@@ -7,21 +7,26 @@
 <body>
     <%- include ('base/navbar'); %>
     <div class="container mt-4">
-        <div style="display: flex; justify-content: space-between;">
-            <h1 class="mb-3"><%= userName %>'s Page</h1>
-            <div>
-                <a href="/author/setting" class="btn btn-secondary mr-1">Settings</a>
-                <a href="/author/article" class="btn btn-primary ml-1">Create Article</a>
+        <div class="row align-items-center" style="display: flex;">
+            <div class="col-md-8">
+                <h1 class="mb-3"><%= blog.blogTitle %></h1>
+                <h2 class="mb-3"><%= blog.blogSubtitle %></h2>
+                <p><strong>Author: </strong><%= blog.authorName %></p>
+            </div>
+            <div class="col-md-4 container" style="display: flex; align-items: center; justify-content: center;">
+                <a href="/author/setting" class="btn btn-secondary mb-2">Settings</a>
+                <span style="padding: 10px;"></span>
+                <a href="/author/article" class="btn btn-primary">Create Article</a>
             </div>
         </div>
         <h2 class="mb-3">Published Articles</h2>
         <% if(publishedArticles.length > 0) { %>
             <div class="list-group">
                 <% publishedArticles.sort((a, b) => new Date(b.publicationDate) - new Date(a.publicationDate)).forEach(function(article) { %>
-                    <div class="list-group-item container">
+                    <div class="list-group-item">
                         <div style="display: flex; justify-content: space-between;">
                             <div class="container">
-                                <a href="<%= '/articles/' + article.id %>" class="link-dark text-decoration-none">
+                                <a href="<%= '/reader/article/' + article.id %>" class="link-dark text-decoration-none">
                                   <h3 class="mb-1"><%= article.title %></h3>
                                   <h4 class="mb-1"><%= article.subtitle %></h4>
                                   <div class="d-flex justify-content-between">

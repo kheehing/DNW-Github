@@ -7,29 +7,14 @@
 <body>
     <%- include ('base/navbar'); %>
     <div class="container mt-4">
-        <h1 class="mb-3">Blogs</h1>
-        <% if(blogs.length > 0) { %>
-            <div class="list-group">
-                <% blogs.forEach(function(blog) { %>
-                    <div class="list-group-item">
-                        <h2 class="mb-1"><%= blog.title %></h2>
-                        <h3 class="mb-2"><%= blog.subtitle %></h3>
-                        <p><strong>By:</strong> <%= blog.authorName %></p>
-                    </div>
-                <% }); %>
-            </div>
-        <% } else { %>
-            <div class="alert alert-warning">
-                Blogs are empty at the moment...
-            </div>
-        <% } %>
-
-        <h1 class="mt-5 mb-3">Articles</h1>
+        <h1 class="mb-3">Articles</h1>
         <% if(articles.length > 0) { %>
-            <% articles.sort((a, b) => new Date(b.publicationDate) - new Date(a.publicationDate)).forEach(function(article) { %>
+            <% articles.forEach(function(article) { %>
                 <div class="list-group-item">
-                    <a href="<%= article.url %>" class="link-dark text-decoration-none">
+                    <a href="/reader/article/<%= article.id %>" class="link-dark text-decoration-none">
                         <h2 class="mb-1"><%= article.title %></h2>
+                        <h3 class="mb-2"><%= article.subtitle %></h3>
+                        <p><strong>By:</strong> <%= article.author %></p>
                         <p><strong>Published on:</strong> <%= new Date(article.publicationDate).toLocaleDateString() %></p>
                     </a>
                 </div>
