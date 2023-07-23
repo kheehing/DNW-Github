@@ -9,8 +9,8 @@
     <div class="container mt-4">
         <div class="d-flex justify-content-between">
             <a href="/reader" class="btn btn-secondary align-self-center">< Back to Reader Home</a>
-            <h1 id="articleTitle"><%= article.title %></h1>
-            <h2 id="articleSubtitle"><%= article.subtitle %></h2>
+            <h1 id="articleTitle"><strong>Title: </strong><%= article.title %></h1>
+            <h2 id="articleSubtitle"><strong>Subtitle: </strong><%= article.subtitle %></h2>
             <p><strong>Author: </strong><%= article.author %></p>
         </div> 
         <p class="text-muted"><%= article.articleCreation %></p>
@@ -21,5 +21,78 @@
             <p id="articleText"><%= article.content %></p> <!-- Change this line -->
         </div>
     </div>
+    <div class="container mt-4">
+        <h3 class="mb-3">Comments</h3>
+        <% if (userName == '') { %>
+            <form>
+                <div class="form-group">
+                    <label for="commentInput">Add comment:</label>
+                    <textarea class="form-control" id="commentInput" name="commentInput" rows="3" disabled></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" disabled>Submit Comment</button>
+            </form>
+        <% } else { %>
+            <form action="/reader/article/<%= article.id %>/comment" method="post">
+                <div class="form-group">
+                    <label for="commentInput">Add comment:</label>
+                    <textarea class="form-control" id="commentInput" name="commentInput" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Submit Comment</button>
+            </form>
+        <% } %>
+        <div id="comments-container">
+            <% comments.forEach((comment) => { %>
+                <div class="card mb-3" id="comment-<%= comment.id %>">
+                    <div class="card-body">
+                        <p><strong><%= comment.username %></strong> <span class="text-muted" id="comment-<%= comment.id %>"> (Loading...) </span>: </p>
+                        <p><%= comment.comments %></p>
+                    </div>
+                </div>
+            <% }) %>
+        </div>
+    </div>
+    <script>
+        function getRelativeTime(past) {
+          const msPerMinute = 60 * 1000;
+          const msPerHour = msPerMinute * 60;
+          const msPerDay = msPerHour * 24;
+          const msPerMonth = msPerDay * 30;
+          const msPerYear = msPerDay * 365;
+    
+          const elapsed = new Date() - new Date(past);
+    
+          if (elapsed < msPerMinute) {
+            return 'Just now';
+          } else if (elapsed < msPerHour) {
+            return Math.round(elapsed / msPerMinute) + ' minutes ago';
+          } else if (elapsed < msPerDay) {
+            return Math.round(elapsed / msPerHour) + ' hours ago';
+          } else if (elapsed < msPerMonth) {
+            return 'about ' + Math.round(elapsed / msPerDay) + ' days ago';
+          } else if (elapsed < msPerYear) {
+            return 'about ' + Math.round(elapsed / msPerMonth) + ' months ago';
+          } else {
+            return 'about ' + Math.round(elapsed / msPerYear) + ' years ago';
+          }
+        }
+    
+        function updateRelativeTimeForComments() {
+            const comments = JSON.parse('<%- JSON.stringify(comments) %>'); // Get the comments data from the EJS template
+            comments.forEach((comment) => {
+            const commentElement = document.getElementById("comment-" + comment.id);
+            const timeElement = commentElement.querySelector(".text-muted");
+    
+            // Calculate the new relative time and update the time element's content
+            const relativeTime = getRelativeTime(comment.createdAt); // Use the getRelativeTime function from the client side
+            timeElement.textContent = " (" + relativeTime + ")";
+          });
+        }
+    
+        // Update relative time for comments initially
+        updateRelativeTimeForComments();
+    
+        // Set an interval to update the relative time every 30 seconds
+        setInterval(updateRelativeTimeForComments, 30000); // 30000 milliseconds = half a minute
+    </script>
 </body>
 </html>

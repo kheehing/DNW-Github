@@ -32,7 +32,9 @@ CREATE TABLE IF NOT EXISTS Comments (
     createdAt TEXT NOT NULL,
     lastModified TEXT NOT NULL,
     ArticleId INTEGER NOT NULL,
-    FOREIGN KEY (ArticleId) REFERENCES Articles(id)
+    UserId INTEGER NOT NULL,
+    FOREIGN KEY (ArticleId) REFERENCES Articles(id),
+    FOREIGN KEY (UserId) REFERENCES userLoginInfo(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS Blog (

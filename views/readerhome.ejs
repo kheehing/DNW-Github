@@ -12,8 +12,8 @@
             <% articles.forEach(function(article) { %>
                 <div class="list-group-item">
                     <a href="/reader/article/<%= article.id %>" class="link-dark text-decoration-none">
-                        <h2 class="mb-1"><%= article.title %></h2>
-                        <h3 class="mb-2"><%= article.subtitle %></h3>
+                        <h2 class="mb-1"><strong>Title: </strong><%= article.title %></h2>
+                        <h3 class="mb-2"><strong>Subtitle: </strong><%= article.subtitle %></h3>
                         <p><strong>By:</strong> <%= article.author %></p>
                         <p><strong>Published on:</strong> <%= new Date(article.publicationDate).toLocaleDateString() %></p>
                     </a>
