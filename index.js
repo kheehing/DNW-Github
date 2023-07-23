@@ -38,6 +38,18 @@ app.use((req, res, next) => {
     next();
 });
 
+function isEmailRegistered(email) {
+  return new Promise((resolve, reject) => {
+      db.get('SELECT user_id FROM userLoginInfo WHERE LOWER(user_email) = ?', [email.toLowerCase()], (err, row) => {
+          if (err) {
+              return reject('Internal server error'); // Reject the promise if there is an error
+          }
+          const emailExists = !!row;
+          resolve(emailExists);
+      });
+  });
+}
+
 //  =========================================================
 //  ===================== Reader and Author =================
 //  =========================================================

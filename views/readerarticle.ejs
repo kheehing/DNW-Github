@@ -16,10 +16,14 @@
         <p class="text-muted"><%= article.articleCreation %></p>
         <hr>
     </div>
+    
     <div class="container mt-4">
-        <div class="card p-4">
-            <p id="articleText"><%= article.content %></p> <!-- Change this line -->
-        </div>
+        <% if (userName == '') { %>
+            <button class="btn btn-primary" disabled>Like</button>
+        <% } else { %>
+            <button id="likeButton" class="btn btn-primary">Like</button>
+        <% } %>
+        <p id="likeCount">Likes: <%= article.likes %></p>
     </div>
     <div class="container mt-4">
         <h3 class="mb-3">Comments</h3>
@@ -76,6 +80,7 @@
           }
         }
     
+        // update the comments' time
         function updateRelativeTimeForComments() {
             const comments = JSON.parse('<%- JSON.stringify(comments) %>'); // Get the comments data from the EJS template
             comments.forEach((comment) => {
@@ -92,7 +97,25 @@
         updateRelativeTimeForComments();
     
         // Set an interval to update the relative time every 30 seconds
-        setInterval(updateRelativeTimeForComments, 30000); // 30000 milliseconds = half a minute
+        setInterval(updateRelativeTimeForComments, 30000);
+
+        // handle the like buton clicking
+        document.getElementById('likeButton').addEventListener('click', function() {
+            // Send an AJAX request to the server
+            fetch('/reader/article/<%= article.id %>/like', {
+                method: 'POST',
+                credentials: 'same-origin'  // This is required to include the session cookie in the request
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Update the like count on the page
+                    const likeCountElement = document.getElementById('likeCount');
+                    const currentLikes = parseInt(likeCountElement.textContent.split(' ')[1]);
+                    likeCountElement.textContent = 'Likes: ' + (currentLikes + 1);
+                }
+            })
+            .catch(console.error);
+        });
     </script>
 </body>
 </html>

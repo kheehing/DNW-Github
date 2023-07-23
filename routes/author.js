@@ -41,6 +41,10 @@ router.get('/', checkAuthorAccess, (req, res) => {
                 return res.status(500).send('Internal Server Error');
             }
 
+            if (!blog){
+                blog = ['','',''];
+            }
+
             // Render the page with article and blog information
             res.render('authorhome', { 
                 blog: blog, 
