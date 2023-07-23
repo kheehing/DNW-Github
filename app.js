@@ -188,12 +188,11 @@ app.post('/register', async (req, res) => {
 app.get('/', (req, res) => {
     // Check if the session contains user information (logged in)
     if (req.session.user) {
-    if (req.session.email == authorEmail) {
-        // User is logged in, redirect to the dashboard page (change "/dashboard" to your desired route)
-        return res.redirect('/author');
-    } else {
-
-    }
+        if (req.session.user.email == authorEmail) {
+            return res.redirect('/author');
+        } else {
+            return res.redirect('/reader');
+        }
     }
 
     res.render('index');
