@@ -86,14 +86,12 @@ router.get('/article/:id', checkUserAccess, (req, res) => {
 });
 
 router.post('/article/:id/like', checkUserAccess, (req, res) => {
-    // Check if the user is logged in
     const _userId = req.session.user.id;
     if (_userId) {
         const sqlExists = `SELECT * FROM Likes WHERE ArticleId = ? AND UserId = ?`;
         const sqlInsert = `INSERT INTO Likes (ArticleId, UserId) VALUES (?, ?)`;
         const sqlDelete = `DELETE FROM Likes WHERE ArticleId = ? AND UserId = ?`;
 
-        // Check if the like already exists
         db.get(sqlExists, [req.params.id, _userId], (err, row) => {
             if (err) {
                 console.log('error7');
@@ -101,14 +99,12 @@ router.post('/article/:id/like', checkUserAccess, (req, res) => {
             }
 
             if (row) {
-                // The like already exists, so remove it
                 db.run(sqlDelete, [req.params.id, _userId], (err) => {
                     if (err) {
                         console.log('error5');
                         return console.error(err.message);
                     }
 
-                    // Decrement the like count in the Articles table
                     const sql = `UPDATE Articles SET likes = likes - 1 WHERE id = ?`;
                     db.run(sql, [req.params.id], (err) => {
                         if (err) {
@@ -119,14 +115,12 @@ router.post('/article/:id/like', checkUserAccess, (req, res) => {
                     });
                 });
             } else {
-                // The like does not exist, so add it
                 db.run(sqlInsert, [req.params.id, _userId], (err) => {
                     if (err) {
                         console.log('erro222r1');
                         return console.error(err.message);
                     }
 
-                    // Increment the like count in the Articles table
                     const sql = `UPDATE Articles SET likes = likes + 1 WHERE id = ?`;
                     db.run(sql, [req.params.id], (err) => {
                         if (err) {
@@ -139,7 +133,7 @@ router.post('/article/:id/like', checkUserAccess, (req, res) => {
             }
         });
     } else {
-        res.sendStatus(401);  // Unauthorized
+        res.sendStatus(401);
     }
 });
 

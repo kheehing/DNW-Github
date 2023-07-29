@@ -30,11 +30,9 @@ router.get('/', checkAuthorAccess, (req, res) => {
             return res.status(500).send('Internal Server Error');
         }
 
-        // Filter published articles and draft articles based on the 'isPublished' flag
         const publishedArticles = articles.filter(article => article.isPublished);
         const draftArticles = articles.filter(article => !article.isPublished);
 
-        // Fetch blog details
         db.get(blogQuery, [], (err, blog) => {
             if (err) {
                 console.error(err);
@@ -86,7 +84,6 @@ router.get('/setting', checkAuthorAccess, (req, res) => {
 router.post('/setting/update', checkAuthorAccess, (req, res) => {
     const { blogTitle, blogSubtitle } = req.body;
     const authorName = req.session.user.name;
-    // First, try to update the existing row
     let query = `
         UPDATE Blog
         SET Title = ?, Subtitle = ?, author = ?
@@ -99,9 +96,7 @@ router.post('/setting/update', checkAuthorAccess, (req, res) => {
             return res.status(500).send('Internal Server Error');
         }
 
-        // Check if the update affected any rows
         if (this.changes === 0) {
-            // If no rows were updated, insert a new one
             query = `
                 INSERT INTO Blog (id, Title, Subtitle, author)
                 VALUES (?, ?, ?, ?)
@@ -129,7 +124,6 @@ router.get('/article/:articleId?', checkAuthorAccess, (req, res) => {
     const articleId = req.params.articleId;
     const loggedInAuthorName = req.session.user.name;
 
-    // If articleId is provided, fetch the article data for editing
     if (articleId) {
         db.get('SELECT * FROM Articles WHERE id = ? AND author = ?', [articleId, loggedInAuthorName], (err, row) => {
             if (err) {
@@ -137,29 +131,27 @@ router.get('/article/:articleId?', checkAuthorAccess, (req, res) => {
                 return res.status(500).send('Internal Server Error');
             }
 
-            // Check if the article exists and belongs to the logged-in user
             if (!row) { 
                 return res.status(404).send('Article not found');
             }
 
-            // Render the authorarticle.ejs with the article information
             res.render('authorarticle', {
                 articleId: row.id,
                 articleTitle: row.title,
                 articleSubtitle: row.subtitle,
                 articleText: row.content,
                 articleAuthor: row.author,
-                articleCreation: row.createdAt // Added this line to include articleCreation
+                articleCreation: row.createdAt
             });
         });
-    } else { // Empty string when making a new article
+    } else {
         res.render('authorarticle', {
             articleId: null,
             articleTitle: '',
             articleSubtitle: '',
             articleText: '',
             articleAuthor: loggedInAuthorName,
-            articleCreation: new Date(), // Added this line to include articleCreation
+            articleCreation: new Date(),
         });
     }
 });
@@ -168,30 +160,27 @@ router.post('/publish', checkAuthorAccess, (req, res) => {
     const articleId = req.body.articleId;
     const author = req.session.user.name; 
 
-    // If there's an articleId, it means it's a draft being published
     if (articleId) {
-        // First, fetch the current details of the article
         const fetchSql = 'SELECT title, subtitle, content, author FROM Articles WHERE id = ?';
         db.get(fetchSql, [articleId], (err, row) => {
             if (err) {
                 return console.error(err.message);
             }
 
-            // If the article exists, publish it
             if (row) {
                 const data = [
-                    row.title,     // fetched from the database
-                    row.subtitle,  // fetched from the database
-                    row.author,    // fetched from the database
-                    row.content,   // fetched from the database
-                    new Date(),    // Last Modified
-                    1,             // isPublished
-                    0,             // Likes
-                    new Date()     // Publication Date
+                    row.title,
+                    row.subtitle,
+                    row.author,
+                    row.content,
+                    new Date(),
+                    1,     
+                    0,           
+                    new Date()  
                 ];
 
                 const updateSql = 'UPDATE Articles SET title = ?, subtitle = ?, author = ?, content = ?, lastModified = ?, isPublished = ?, likes = ?, publicationDate = ? WHERE id = ?';
-                data.push(articleId); // Adding articleId to the data array for the WHERE clause in the SQL statement
+                data.push(articleId);
                 db.run(updateSql, data, function(err) {
                     if (err) {
                         return console.error(err.message);
@@ -204,17 +193,17 @@ router.post('/publish', checkAuthorAccess, (req, res) => {
                 res.redirect('/author');
             }
         });
-    } else { // Otherwise, it's a new article
+    } else { 
         const data = [
             req.body.articleTitle,
             req.body.articleSubtitle,
             author,
             req.body.articleText,
-            new Date(),  // CreatedAt
-            new Date(),  // Last Modified
-            1,           // isPublished
-            0,           // Likes
-            new Date()   // Publication Date
+            new Date(), 
+            new Date(),  
+            1,     
+            0,       
+            new Date()  
         ];
 
         const insertSql = 'INSERT INTO Articles (title, subtitle, author, content, createdAt, lastModified, isPublished, likes, publicationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';
@@ -246,21 +235,20 @@ router.post('/saveasdraft', checkAuthorAccess, (req, res) => {
     const articleId = req.body.articleId;
     const author = req.session.user.name;
 
-    // If there's an articleId, it means we're updating a draft
     if (articleId) {
         const data = [
             req.body.articleTitle,
             req.body.articleSubtitle,
             author,
             req.body.articleText,
-            new Date(),    // Last Modified
-            0,             // isPublished
-            0,             // Likes
-            0,             // Publication Date
+            new Date(),   
+            0,           
+            0,          
+            0,          
         ];
 
         const updateSql = 'UPDATE Articles SET title = ?, subtitle = ?, author = ?, content = ?, lastModified = ?, isPublished = ?, likes = ?, publicationDate = ? WHERE id = ?';
-        data.push(articleId); // Adding articleId to the data array for the WHERE clause in the SQL statement
+        data.push(articleId);
         db.run(updateSql, data, function(err) {
             if (err) {
                 return console.error(err.message);
@@ -268,17 +256,17 @@ router.post('/saveasdraft', checkAuthorAccess, (req, res) => {
             console.log(`Article with id ${articleId} has been saved as draft`);
             res.redirect('/author');
         });
-    } else { // Otherwise, it's a new article
+    } else { 
         const data = [
             req.body.articleTitle,
             req.body.articleSubtitle,
             author,
             req.body.articleText,
-            new Date(),  // CreatedAt
-            new Date(),  // Last Modified
-            0,           // isPublished
-            0,           // Likes
-            0,           // Publication Date
+            new Date(), 
+            new Date(),
+            0,          
+            0,     
+            0,    
         ];
 
         const insertSql = 'INSERT INTO Articles (title, subtitle, author, content, createdAt, lastModified, isPublished, likes, publicationDate) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)';

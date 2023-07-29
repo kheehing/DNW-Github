@@ -30,12 +30,9 @@
                                   <h3 class="mb-1"><%= article.title %></h3>
                                   <h4 class="mb-1"><%= article.subtitle %></h4>
                                   <div class="d-flex justify-content-between">
-                                    <!-- Likes container -->
                                     <div class="likes-container">
                                       <p><strong>Likes:</strong> <%= article.likes %></p>
                                     </div>
-                              
-                                    <!-- Dates container -->
                                     <div class="dates-container">
                                       <p>
                                         <span><strong>Published on:</strong> <%= new Date(article.publicationDate).toLocaleDateString() %></span>
@@ -103,21 +100,13 @@
     </div>
     <script>
         function copyToClipboard(url) {
-            // Create a new textarea element
             var textarea = document.createElement('textarea');
-            // Set its value to the URL
             textarea.value = window.location.origin + url;
-            // Make sure it's not visible
             textarea.style.opacity = "0";
-            // Append it to the body
             document.body.appendChild(textarea);
-            // Select the content
             textarea.select();
-            // Copy the text inside
             document.execCommand('copy');
-            // Remove the textarea element
             document.body.removeChild(textarea);
-            // Show the alert with the copied URL
             alert('Share link copied to clipboard: ' + window.location.origin + url);
         }
     </script>

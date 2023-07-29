@@ -1,105 +1,134 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+  <head>
     <%- include ('base/head'); %>
     <title>Registeration</title>
-</head>
-<body>
-    <%- include ('base/navbar'); %>   
-    <br><br><br><br><br><br><br><br>
+  </head>
+  <body>
+    <%- include ('base/navbar'); %>
+    <br /><br /><br /><br /><br /><br /><br /><br />
     <div class="container mh-100 mt-6">
-        <div class="row justify-content-center">
-            <div class="col-md-6 col-md-offset-3">
-                <div class="card">
-                    <div class="card-body">
-                        <h2 class="card-title text-center">Register an Account</h2>
-                            <form action="/register" method="POST" id="register-form">
-                                <div class="form-group">
-                                    <label for="name">Full name</label>
-                                    <input type="text" class="form-control" id="name" name="name" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="email">Email address</label>
-                                    <input type="email" class="form-control" id="email" name="email" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="confirmemail">Confirm Email address</label>
-                                    <input type="email" class="form-control" id="confirmemail" name="confirmemail" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="password">Password</label>
-                                    <input type="password" class="form-control" id="password" name="password" required>
-                                </div>
-                                <div class="form-group">
-                                    <label for="confirmpassword">Retype Password</label>
-                                    <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" required>
-                                </div>
-                                <button type="submit" class="btn btn-primary btn-block">Register</button>
-                            </form>
-                        </div>
-                    </div>
-                    <br>
-                <div class="card mt-3">
-                    <div class="card-body text-center">
-                        <p>Have an account? <a href="/login">Login</a></p>
-                    </div>
+      <div class="row justify-content-center">
+        <div class="col-md-6 col-md-offset-3">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title text-center">Register an Account</h2>
+              <form action="/register" method="POST" id="register-form">
+                <div class="form-group">
+                  <label for="name">Full name</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    name="name"
+                    required
+                  />
                 </div>
+                <div class="form-group">
+                  <label for="email">Email address</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    name="email"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="confirmemail">Confirm Email address</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="confirmemail"
+                    name="confirmemail"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    name="password"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <label for="confirmpassword">Retype Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="confirmpassword"
+                    name="confirmpassword"
+                    required
+                  />
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                  Register
+                </button>
+              </form>
             </div>
+          </div>
+          <br />
+          <div class="card mt-3">
+            <div class="card-body text-center">
+              <p>Have an account? <a href="/login">Login</a></p>
+              <p>note to examiner: author's email is 'author@onlyblog.com'</p>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
     <script>
-        $(document).ready(() => {
-            $('#register-form').submit((event) => {
-                event.preventDefault();
-        
-                const email = $('#email').val();
-                const confirmEmail = $('#confirmemail').val();
-                const password = $('#password').val();
-                const confirmPassword = $('#confirmpassword').val();
-        
-                // Check if the email and confirmEmail fields match
-                if (email !== confirmEmail) {
-                    alert('Email addresses do not match');
-                    return;
-                }
-        
-                // Check if the password and confirmPassword fields match
-                if (password !== confirmPassword) {
-                    alert('Passwords do not match');
-                return;
-                }
+      $(document).ready(() => {
+        $("#register-form").submit((event) => {
+          event.preventDefault();
+          const email = $("#email").val();
+          const confirmEmail = $("#confirmemail").val();
+          const password = $("#password").val();
+          const confirmPassword = $("#confirmpassword").val();
 
-                if (!isValidPassword(password)) {
-                    alert('Password must be at least 8 characters long and contain at least one letter and one number');
-                    return;
-                }
-        
-                const formData = $('#register-form').serialize();
-        
-                $.ajax({
-                    type: 'POST',
-                    url: '/register',
-                    data: formData,
-                    dataType: 'json',
-                    success: (data) => {
-                        // Registration successful
-                        alert(data.message); // Show the success message in an alert
-                        window.location.href = "/login";
-                        console.log(data.message);
-                    },
-                    error: (error) => {
-                        // Registration failed
-                        alert(error.responseJSON.error); // Show the error message in an alert
-                    }
-                });
-            });
+          if (email !== confirmEmail) {
+            alert("Email addresses do not match");
+            return;
+          }
 
-            // using regex to validate for password for at least 8 characters with at least one letter and one number
-            function isValidPassword(password) {
-                const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/; 
-                return passwordPattern.test(password);
-            }
+          if (password !== confirmPassword) {
+            alert("Passwords do not match");
+            return;
+          }
+
+          if (!isValidPassword(password)) {
+            alert(
+              "Password must be at least 8 characters long and contain at least one letter and one number"
+            );
+            return;
+          }
+
+          const formData = $("#register-form").serialize();
+
+          $.ajax({
+            type: "POST",
+            url: "/register",
+            data: formData,
+            dataType: "json",
+            success: (data) => {
+              alert(data.message);
+              window.location.href = "/login";
+              console.log(data.message);
+            },
+            error: (error) => {
+              alert(error.responseJSON.error);
+            },
+          });
         });
+        // using regex to validate for password for at least 8 characters with at least one letter and one number
+        function isValidPassword(password) {
+          const passwordPattern = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+          return passwordPattern.test(password);
+        }
+      });
     </script>
-</body>
+  </body>
 </html>

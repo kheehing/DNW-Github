@@ -83,33 +83,26 @@
             return 'about ' + Math.round(elapsed / msPerYear) + ' years ago';
           }
         }
-    
-        // update the comments' time
+        
         function updateRelativeTimeForComments() {
-            const comments = JSON.parse('<%- JSON.stringify(comments) %>'); // Get the comments data from the EJS template
+            const comments = JSON.parse('<%- JSON.stringify(comments) %>');
             comments.forEach((comment) => {
             const commentElement = document.getElementById("comment-" + comment.id);
             const timeElement = commentElement.querySelector(".text-muted");
-    
-            // Calculate the new relative time and update the time element's content
-            const relativeTime = getRelativeTime(comment.createdAt); // Use the getRelativeTime function from the client side
+            const relativeTime = getRelativeTime(comment.createdAt);
             timeElement.textContent = " (" + relativeTime + ")";
           });
         }
-    
-        // Update relative time for comments initially
         updateRelativeTimeForComments();
-    
-        // Set an interval to update the relative time every 30 seconds
         setInterval(updateRelativeTimeForComments, 30000);
 
         $(document).ready(function() {
             $('#likeBtn').click(function(e) {
                 e.preventDefault();
         
-                var articleId = '<%= article.id %>';  // get the article id from the EJS template
-                var userHasLiked = '<%= userHasLiked %>';  // get the userHasLiked flag from the EJS template
-                var likesCount = parseInt($('#likesNumber').text(), 10);  // get the current number of likes
+                var articleId = '<%= article.id %>';
+                var userHasLiked = '<%= userHasLiked %>';
+                var likesCount = parseInt($('#likesNumber').text(), 10);
 
                 $.ajax({
                     url: '/reader/article/' + articleId + '/like',

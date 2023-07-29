@@ -39,28 +39,21 @@
       <script>
         $(document).ready(() => {
           $('#login-form').submit((event) => {
-            event.preventDefault(); // Prevent the default form submission
-      
+            event.preventDefault();
             const email = $('#email').val();
             const password = $('#password').val();
-      
-            // Prepare the data to send to the server
             const formData = {
               email: email,
               password: password
             };
-      
-            // Send the AJAX request
             $.ajax({
               type: 'POST',
               url: '/login',
               data: formData,
               dataType: 'json',
               success: (data) => {
-                // Display a success message in an alert
                 alert(data.message);
-                // Optionally, you can redirect the user to a different page after successful login
-                window.location.href = '/'; // Replace '/dashboard' with the desired page URL
+                window.location.href = '/';
               },
               error: (xhr, status, error) => {
                 const responseText = xhr.responseText;
@@ -68,7 +61,7 @@
                   const errorResponse = JSON.parse(responseText);
                   alert(errorResponse.error);
                 } catch (err) {
-                  console.error('Error parsing JSON:', err); // Debugging statement
+                  console.error('Error parsing JSON:', err);
                   alert('An error occurred while processing your request.');
                 }
               }

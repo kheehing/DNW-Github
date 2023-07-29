@@ -6,14 +6,13 @@
 </head>
 <body>
     <%- include ('base/navbar'); %>
-    <!-- Hero Section -->
     <section class="hero text-light text-center py-5">
         <div class="container">
             <h1 class="display-4">In the Realm of the Log, There's 
                 <span class="text-center"><span class="only">Only</span><span class="blog">Blog</span></span></h1>
             <p class="lead">In the realm of logs, where thoughts meet words, OnlyBlog reigns as the ultimate platform for passionate bloggers, offering a captivating space to unleash creativity, share insights, and engage in a vibrant community.</p>
             <% if (!userEmail) { %>
-                <div class="d-flex justify-content-center"> <!-- Use "d-flex justify-content-center" to center the buttons horizontally -->
+                <div class="d-flex justify-content-center">
                     <a id="register" class="btn btn-primary" href="/register">Get Started</a>
                     <a id="login" class="btn btn-secondary" href="/login">login</a>
                 </div>
